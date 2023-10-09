@@ -1,13 +1,74 @@
-<script setup lang="ts">
-
-</script>
 
 <template>
-<div>
-  Привет мир
-</div>
+  <div class="container">
+      <h1 class="window-title">Ковертер валют</h1>
+      <LoaderUi v-if="isLoader"/>
+      <div class="content-wrap" v-else>
+          <InputCurrency :modelValue="sumToCalc" @update:modelValue="sumToCalc = $event"/>
+          <SelectCurrency 
+            :selectedCurrency="selectedCurrency"
+            :currencyArray="currencyArray" @currentCurrency="selectedCurrency = $event" />
+          <p class="input result-window">{{ calcToRubles }}₽</p>
+        </div>
+
+  </div>
 </template>
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-<style scoped>
+// Компоненты
+import InputCurrency from '@/components/InputCurrency.vue';
+import SelectCurrency from '@/components/SelectCurrency.vue'
+import LoaderUi from '@/ui/LoaderUi.vue'
 
-</style>
+import type {Currency} from './interfaces'
+
+export default defineComponent({
+  name: 'App',
+  components: { InputCurrency, SelectCurrency, LoaderUi},
+  data() {
+    return {
+      sumToCalc: "" as string,
+      selectedCurrency: null as Currency |  null,
+      timer: null as ReturnType<typeof setTimeout> | null,
+      currencyArray: {} as Record<string, Currency>,
+      isLoader: true as Boolean
+    }
+  },
+  computed: {
+    calcToRubles():number{
+      return Number(this.sumToCalc) * (this.selectedCurrency?.Value ?? 0)
+    },
+  },
+  methods: {
+    delayedStart() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      this.timer = setTimeout(this.requestApi, 1000);
+    },
+    async requestApi(){
+      this.isLoader = true
+      try {
+        const request = await fetch('https://www.cbr-xml-daily.ru/daily_json.js');
+        const result = await request.json()
+        this.currencyArray = result.Valute
+      } catch (error) {
+        alert(error)
+      } finally {
+        this.isLoader = false
+      }
+    },
+  },
+  watch: {
+    sumToCalc(){
+      this.delayedStart()
+    }
+  },
+  mounted() {
+    this.requestApi()
+    const getSelectedCurrency = localStorage.getItem('selectedCurrency')
+    this.selectedCurrency = JSON.parse(getSelectedCurrency ?? 'null')
+  }
+})
+</script>
