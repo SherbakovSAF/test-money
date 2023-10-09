@@ -1,6 +1,7 @@
 <template>
      <div>
           <select @change="changeSelectedCurrency($event.target.value)"  class="input">
+               <option :selected="!currencyArray.lenght" value="null" disabled>Не выбрано</option>
                <option v-for="currency in currencyArray" :key="currency.ID" :value="currency.CharCode"
                     :selected="selectedCurrency?.CharCode == currency.CharCode">
                     {{ currency.CharCode }} ({{ currency.Name }})

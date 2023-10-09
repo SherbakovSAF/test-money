@@ -4,7 +4,9 @@
       <h1 class="window-title">Ковертер валют</h1>
       <LoaderUi v-if="isLoader"/>
       <div class="content-wrap" v-else>
-          <InputCurrency :modelValue="sumToCalc" @update:modelValue="sumToCalc = $event"/>
+          <div >
+            <InputCurrency :hidden="!selectedCurrency" :modelValue="sumToCalc" @update:modelValue="sumToCalc = $event"/>
+          </div>
           <SelectCurrency 
             :selectedCurrency="selectedCurrency"
             :currencyArray="currencyArray" @currentCurrency="selectedCurrency = $event" />
