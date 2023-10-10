@@ -1,7 +1,7 @@
 <template>
      <div>
           <input autofocus type="number" placeholder="Введите значение для конвертации" class="input"
-               :value="modelValue" @input="$emit('update:modelValue', $event.target.value)">
+               :value="modelValue" @input="(event: Event)=> $emit('update:modelValue', (event.target as HTMLInputElement).value)">
      </div>
 </template>
 <script lang="ts">

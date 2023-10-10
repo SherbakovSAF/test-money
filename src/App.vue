@@ -5,14 +5,13 @@
       <LoaderUi v-if="isLoader"/>
       <div class="content-wrap" v-else>
           <div >
-            <InputCurrency :hidden="!selectedCurrency" :modelValue="sumToCalc" @update:modelValue="sumToCalc = $event"/>
+            <InputCurrency :hidden="!selectedCurrency" v-model="sumToCalc"/>
           </div>
           <SelectCurrency 
             :selectedCurrency="selectedCurrency"
-            :currencyArray="currencyArray" @currentCurrency="selectedCurrency = $event" />
+            :currencyArray="currencyArray" @selectedCurrency="selectedCurrency = $event" />
           <p class="input result-window">{{ calcToRubles }}₽</p>
         </div>
-
   </div>
 </template>
 <script lang="ts">
@@ -23,6 +22,7 @@ import InputCurrency from '@/components/InputCurrency.vue';
 import SelectCurrency from '@/components/SelectCurrency.vue'
 import LoaderUi from '@/ui/LoaderUi.vue'
 
+// Типы TypeScript
 import type {Currency} from './interfaces'
 
 export default defineComponent({
@@ -33,7 +33,7 @@ export default defineComponent({
       sumToCalc: "" as string,
       selectedCurrency: null as Currency |  null,
       timer: null as ReturnType<typeof setTimeout> | null,
-      currencyArray: {} as Record<string, Currency>,
+      currencyArray: [] as Currency[],
       isLoader: true as Boolean
     }
   },
@@ -54,7 +54,7 @@ export default defineComponent({
       try {
         const request = await fetch('https://www.cbr-xml-daily.ru/daily_json.js');
         const result = await request.json()
-        this.currencyArray = result.Valute
+        this.currencyArray = Object.values(result.Valute)
       } catch (error) {
         alert(error)
       } finally {
